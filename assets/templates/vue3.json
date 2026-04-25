@@ -1,0 +1,49 @@
+{
+  "name": "Vue 3 + TypeScript",
+  "description": "Composition API conventions for Vue 3 applications",
+  "stack": ["vue", "nodejs"],
+  "rules": [
+    {
+      "category": "coding_style",
+      "title": "Composition API only",
+      "content": "Use <script setup lang=\"ts\"> for all components. Never use the Options API. Prefer composables over mixins.",
+      "priority": 1,
+      "enabled": true
+    },
+    {
+      "category": "architecture",
+      "title": "API calls via Pinia stores only",
+      "content": "Components must never call backend APIs directly. All async data operations go through Pinia store actions. Components call store methods and read store state.",
+      "priority": 2,
+      "enabled": true
+    },
+    {
+      "category": "coding_style",
+      "title": "No any type",
+      "content": "Never use any or unknown without a comment explaining why. Type all props with TypeScript interfaces. Type all emits explicitly.",
+      "priority": 3,
+      "enabled": true
+    },
+    {
+      "category": "naming",
+      "title": "Component and file naming",
+      "content": "Component files must use PascalCase.vue. Composable files must use use-kebab-case.ts. Custom event names must use kebab-case.",
+      "priority": 4,
+      "enabled": true
+    },
+    {
+      "category": "testing",
+      "title": "Unit test with Vitest",
+      "content": "Use Vitest for unit tests. Test composables and store logic. Use @vue/test-utils for component tests. Aim for >70% coverage on stores.",
+      "priority": 5,
+      "enabled": true
+    },
+    {
+      "category": "architecture",
+      "title": "Emit events for parent communication",
+      "content": "Child components must never mutate parent state directly. Always emit events for parent communication. Document emits with defineEmits<{...}>().",
+      "priority": 6,
+      "enabled": true
+    }
+  ]
+}

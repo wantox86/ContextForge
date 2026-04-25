@@ -1,0 +1,49 @@
+{
+  "name": "Spring Boot + Kotlin",
+  "description": "Best practices for Spring Boot applications written in Kotlin",
+  "stack": ["kotlin", "spring-boot", "gradle"],
+  "rules": [
+    {
+      "category": "architecture",
+      "title": "Use layered architecture",
+      "content": "Organise code into Controller → Service → Repository layers. Controllers must not contain business logic. Services must not depend on HTTP request/response objects.",
+      "priority": 1,
+      "enabled": true
+    },
+    {
+      "category": "coding_style",
+      "title": "Prefer data classes for DTOs",
+      "content": "Use Kotlin data classes for all request/response DTOs. Avoid using Map<String, Any> as a return type.",
+      "priority": 2,
+      "enabled": true
+    },
+    {
+      "category": "coding_style",
+      "title": "Use constructor injection",
+      "content": "Inject dependencies via primary constructor. Do not use field injection (@Autowired on fields).",
+      "priority": 3,
+      "enabled": true
+    },
+    {
+      "category": "testing",
+      "title": "Use @SpringBootTest sparingly",
+      "content": "Prefer @WebMvcTest for controller tests and Mockito/MockK for unit tests. Reserve @SpringBootTest for integration tests only.",
+      "priority": 4,
+      "enabled": true
+    },
+    {
+      "category": "security",
+      "title": "Never log sensitive data",
+      "content": "Do not log passwords, tokens, or PII. Use structured logging (logback) and mask sensitive fields.",
+      "priority": 5,
+      "enabled": true
+    },
+    {
+      "category": "naming",
+      "title": "Follow Spring naming conventions",
+      "content": "Suffix classes with their role: UserController, UserService, UserRepository. Use camelCase for function names.",
+      "priority": 6,
+      "enabled": true
+    }
+  ]
+}

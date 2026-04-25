@@ -1,0 +1,49 @@
+{
+  "name": "Python + FastAPI",
+  "description": "Modern async Python conventions for FastAPI services",
+  "stack": ["python", "fastapi"],
+  "rules": [
+    {
+      "category": "architecture",
+      "title": "Use dependency injection",
+      "content": "Use FastAPI's Depends() for injecting database sessions, auth, and services. Avoid module-level singletons.",
+      "priority": 1,
+      "enabled": true
+    },
+    {
+      "category": "coding_style",
+      "title": "Type all functions with annotations",
+      "content": "Every function parameter and return type must have a type annotation. Use Pydantic models for request/response bodies — never use plain dict.",
+      "priority": 2,
+      "enabled": true
+    },
+    {
+      "category": "coding_style",
+      "title": "Async handlers for I/O",
+      "content": "All route handlers that perform I/O (database, HTTP, file) must be declared as async def. Use await for all async calls.",
+      "priority": 3,
+      "enabled": true
+    },
+    {
+      "category": "testing",
+      "title": "Use pytest with httpx",
+      "content": "Use pytest with httpx.AsyncClient for integration tests. Use pytest-asyncio for async test functions. Mock external dependencies with unittest.mock or pytest-mock.",
+      "priority": 4,
+      "enabled": true
+    },
+    {
+      "category": "security",
+      "title": "Use environment variables for secrets",
+      "content": "Load all secrets from environment variables via pydantic-settings. Never hardcode credentials. Validate required settings at startup.",
+      "priority": 5,
+      "enabled": true
+    },
+    {
+      "category": "naming",
+      "title": "Follow PEP 8",
+      "content": "Use snake_case for functions and variables, PascalCase for classes, UPPER_SNAKE_CASE for constants. Keep line length under 100 characters.",
+      "priority": 6,
+      "enabled": true
+    }
+  ]
+}

@@ -1,32 +1,164 @@
-# If you prefer the allow list template instead of the deny list, see community template:
-# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
-# Binaries for programs and plugins
+# =============================================================================
+# ContextForge — .gitignore
+# Covers: Go backend · Vue/Node frontend · Static web (docs/) · Build output
+# =============================================================================
+
+# =============================================================================
+# GO BACKEND
+# =============================================================================
+
+# Compiled binaries & plugins
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
 
-# Test binary, built with `go test -c`
+# Test binary (go test -c)
 *.test
 
-# Code coverage profiles and other test artifacts
+# Test & coverage artifacts
 *.out
 coverage.*
 *.coverprofile
 profile.cov
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
-# Go workspace file
+# Go workspace
 go.work
 go.work.sum
 
-# env file
-.env
+# Dependency vendor directory (uncomment to ignore)
+# vendor/
 
-# Editor/IDE
-# .idea/
-# .vscode/
+# Air live-reload temp dir
+tmp/
+
+# =============================================================================
+# FRONTEND (Node / Vue / Vite)
+# =============================================================================
+
+# Dependencies
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+frontend/dist-ssr/
+
+# Vite cache
+frontend/.vite/
+
+# TypeScript build info
+frontend/*.tsbuildinfo
+frontend/tsconfig.tsbuildinfo
+
+# Vitest coverage
+frontend/coverage/
+
+# npm / yarn / pnpm logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/.pnpm-store/
+
+# Local env files (Vite)
+frontend/.env.local
+frontend/.env.*.local
+
+# =============================================================================
+# WAILS BUILD OUTPUT
+# =============================================================================
+
+# Compiled app bundles — don't commit binaries
+build/bin/
+
+# Wails frontend md5 checksum (auto-generated)
+frontend/package.json.md5
+
+# =============================================================================
+# WEB / DOCS (GitHub Pages)
+# =============================================================================
+
+# No generated output in docs/ — everything is hand-crafted source
+# Ignore any local preview server caches if added later
+docs/.cache/
+docs/.temp/
+
+# =============================================================================
+# ENVIRONMENT & SECRETS
+# =============================================================================
+
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+secrets.json
+
+# =============================================================================
+# DATABASE (local SQLite dev files)
+# =============================================================================
+
+*.db
+*.sqlite
+*.sqlite3
+
+# =============================================================================
+# EDITOR & IDE
+# =============================================================================
+
+# JetBrains (GoLand, WebStorm, etc.)
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# Vim / Neovim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+\#*\#
+.\#*
+
+# =============================================================================
+# OPERATING SYSTEM
+# =============================================================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+__MACOSX/
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# =============================================================================
+# MISC
+# =============================================================================
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+

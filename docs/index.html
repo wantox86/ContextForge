@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ContextForge — Generate AI Coding Instructions</title>
+  <meta name="description" content="Open-source desktop app that auto-detects your tech stack and generates CLAUDE.md, copilot-instructions.md and more from visual templates." />
+  <meta property="og:title" content="ContextForge" />
+  <meta property="og:description" content="Generate AI coding instruction files from visual templates. Auto-detects your tech stack." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    /* ── Hero ── */
+    .hero {
+      padding: 6rem 0 5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99,102,241,.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: rgba(99,102,241,.12);
+      border: 1px solid rgba(99,102,241,.3);
+      color: #a5b4fc;
+      font-size: .8rem;
+      font-weight: 600;
+      padding: .3rem .9rem;
+      border-radius: 9999px;
+      margin-bottom: 1.5rem;
+      letter-spacing: .04em;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+      letter-spacing: -.02em;
+    }
+    .hero h1 span { color: #818cf8; }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: #9ca3af;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+    }
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 3.5rem;
+    }
+    .hero-platforms {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: .75rem;
+      color: #6b7280;
+      font-size: .82rem;
+    }
+    .hero-platforms span { display: flex; align-items: center; gap: .3rem; }
+
+    /* ── Terminal mockup ── */
+    .terminal {
+      max-width: 680px;
+      margin: 4rem auto 0;
+      background: #0d1117;
+      border: 1px solid #374151;
+      border-radius: 1rem;
+      overflow: hidden;
+      text-align: left;
+      box-shadow: 0 25px 60px rgba(0,0,0,.5);
+    }
+    .terminal-bar {
+      background: #1f2937;
+      padding: .7rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .terminal-bar span {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .terminal-bar .dot-red    { background: #ef4444; }
+    .terminal-bar .dot-yellow { background: #f59e0b; }
+    .terminal-bar .dot-green  { background: #10b981; }
+    .terminal-title { margin-left: .5rem; font-size: .8rem; color: #6b7280; }
+    .terminal-body {
+      padding: 1.25rem 1.5rem;
+      font-family: 'Fira Code', monospace;
+      font-size: .82rem;
+      line-height: 1.9;
+    }
+    .t-prompt { color: #10b981; }
+    .t-cmd    { color: #82aaff; }
+    .t-out    { color: #9ca3af; }
+    .t-tag    { color: #a5b4fc; }
+    .t-ok     { color: #34d399; }
+    .t-warn   { color: #fbbf24; }
+    .cursor   { display: inline-block; width: 8px; height: 1em; background: #818cf8; animation: blink 1s step-end infinite; vertical-align: text-bottom; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── Features ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .feature-card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: .875rem;
+      padding: 1.75rem;
+      transition: border-color .2s, transform .2s;
+    }
+    .feature-card:hover { border-color: #4f46e5; transform: translateY(-3px); }
+    .feature-icon {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+    .feature-card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: .5rem;
+    }
+    .feature-card p { color: #9ca3af; font-size: .9rem; line-height: 1.6; }
+
+    /* ── How it works ── */
+    .steps { margin-top: 3rem; }
+    .step {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      margin-bottom: 2.5rem;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: #312e81;
+      border: 2px solid #4f46e5;
+      color: #818cf8;
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step-body h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: .35rem; }
+    .step-body p  { color: #9ca3af; font-size: .9rem; }
+
+    /* ── Templates ── */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+    .tpl-card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: .75rem;
+      padding: 1.25rem;
+    }
+    .tpl-card h4 { font-size: .95rem; font-weight: 600; margin-bottom: .6rem; }
+    .tpl-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .tpl-tag {
+      background: #312e81;
+      color: #a5b4fc;
+      font-size: .7rem;
+      font-family: 'Fira Code', monospace;
+      padding: .15rem .5rem;
+      border-radius: 4px;
+    }
+
+    /* ── Token section ── */
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      font-size: .9rem;
+    }
+    .token-table th {
+      text-align: left;
+      padding: .75rem 1rem;
+      background: #1f2937;
+      color: #9ca3af;
+      font-weight: 600;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .token-table td {
+      padding: .75rem 1rem;
+      border-bottom: 1px solid #1f2937;
+      font-family: 'Fira Code', monospace;
+    }
+    .token-table tr:hover td { background: #1f2937; }
+
+    /* ── CTA banner ── */
+    .cta-banner {
+      background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
+      border: 1px solid #4f46e5;
+      border-radius: 1.25rem;
+      padding: 3.5rem 2rem;
+      text-align: center;
+    }
+    .cta-banner h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; margin-bottom: .75rem; }
+    .cta-banner p { color: #a5b4fc; margin-bottom: 2rem; font-size: 1.05rem; }
+    .cta-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+
+    /* ── Targets section ── */
+    .targets { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; }
+    .target-card {
+      flex: 1 1 200px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: .75rem;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .target-icon { font-size: 1.75rem; }
+    .target-card strong { display: block; font-size: .95rem; margin-bottom: .15rem; }
+    .target-card span { font-size: .8rem; color: #9ca3af; font-family: 'Fira Code', monospace; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container nav-inner">
+    <a class="nav-logo" href="index.html">
+      ⚡ ContextForge
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#templates">Templates</a></li>
+      <li><a href="download.html">Download</a></li>
+      <li>
+        <a href="https://github.com/wantox86/ContextForge" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.341-3.369-1.341-.454-1.154-1.11-1.462-1.11-1.462-.908-.620.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">✨ Open Source · Free Forever</div>
+    <h1>
+      Generate <span>AI coding</span><br/>
+      instructions in seconds
+    </h1>
+    <p class="hero-sub">
+      ContextForge auto-detects your tech stack and exports perfectly structured
+      instruction files for Claude, GitHub Copilot, Cursor, and more.
+    </p>
+    <div class="hero-actions">
+      <a href="download.html" class="btn btn-primary">
+        ⬇ Download for free
+      </a>
+      <a href="https://github.com/wantox86/ContextForge" target="_blank" class="btn btn-outline">
+        View on GitHub →
+      </a>
+    </div>
+    <div class="hero-platforms">
+      <span>🍎 macOS</span>
+      <span style="color:#374151">·</span>
+      <span>🐧 Linux</span>
+      <span style="color:#374151">·</span>
+      <span>🪟 Windows</span>
+      <span style="color:#374151">·</span>
+      <span>🆓 MIT License</span>
+    </div>
+
+    <!-- Terminal mockup -->
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="dot-red"></span>
+        <span class="dot-yellow"></span>
+        <span class="dot-green"></span>
+        <span class="terminal-title">ContextForge — Analyzing project…</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-prompt">▶</span> <span class="t-cmd">Analyzing</span> <span class="t-out">/Users/dev/my-app…</span></div>
+        <div><span class="t-out">  Scanning indicator files…</span></div>
+        <div>
+          <span class="t-ok">  ✓</span>
+          <span class="t-out"> Detected stack: </span>
+          <span class="t-tag">kotlin</span>
+          <span class="t-out"> </span>
+          <span class="t-tag">spring-boot</span>
+          <span class="t-out"> </span>
+          <span class="t-tag">gradle</span>
+          <span class="t-out"> (confidence 92%)</span>
+        </div>
+        <div><span class="t-ok">  ✓</span> <span class="t-out">Matched template: <span class="t-tag">Spring Boot + Kotlin</span> (6 rules)</span></div>
+        <div><span class="t-ok">  ✓</span> <span class="t-out">Token estimate: <span class="t-tag">~1,240 tokens</span> — within all limits</span></div>
+        <div><span class="t-prompt">▶</span> <span class="t-cmd">Exporting</span> <span class="t-out">CLAUDE.md…</span></div>
+        <div><span class="t-ok">  ✓</span> <span class="t-out">Written to /Users/dev/my-app/CLAUDE.md</span></div>
+        <div><span class="t-ok">  ✓</span> <span class="t-out">Written to /Users/dev/my-app/.github/copilot-instructions.md</span></div>
+        <div>&nbsp;</div>
+        <div><span class="t-prompt">$</span> <span class="cursor"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPORT TARGETS -->
+<section style="padding-top:0; padding-bottom:4rem;">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:1.5rem;">
+      <span class="section-label">Export targets</span>
+      <p style="color:#9ca3af; font-size:.9rem;">One click — multiple AI tools covered</p>
+    </div>
+    <div class="targets">
+      <div class="target-card">
+        <div class="target-icon">🟣</div>
+        <div><strong>Claude (Anthropic)</strong><span>CLAUDE.md</span></div>
+      </div>
+      <div class="target-card">
+        <div class="target-icon">🐙</div>
+        <div><strong>GitHub Copilot</strong><span>.github/copilot-instructions.md</span></div>
+      </div>
+      <div class="target-card" style="opacity:.55; position:relative;">
+        <div class="target-icon">🖱️</div>
+        <div>
+          <strong>Cursor</strong>
+          <span>.cursorrules</span>
+        </div>
+        <span class="badge badge-yellow" style="position:absolute;top:.75rem;right:.75rem;">v0.2</span>
+      </div>
+      <div class="target-card" style="opacity:.55; position:relative;">
+        <div class="target-icon">🤖</div>
+        <div>
+          <strong>Codex / Agents</strong>
+          <span>AGENTS.md</span>
+        </div>
+        <span class="badge badge-yellow" style="position:absolute;top:.75rem;right:.75rem;">v0.2</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" style="background: #0d1117; border-top:1px solid #1f2937; border-bottom:1px solid #1f2937;">
+  <div class="container">
+    <div>
+      <span class="section-label">Features</span>
+      <h2 class="section-title">Everything you need to brief your AI</h2>
+      <p class="section-sub">No more copy-pasting rules between projects. ContextForge handles it all.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Auto Stack Detection</h3>
+        <p>Scans your project directory for indicator files and content patterns. Detects Go, Kotlin, Java, Python, Vue, React, Android, Rust, Flutter, and more.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Visual Rule Builder</h3>
+        <p>Browse matched templates, toggle individual rules on/off, and edit content inline. Build exactly the context your AI needs — nothing more.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👁</div>
+        <h3>Live Preview</h3>
+        <p>See the exact Markdown output before writing a single file. Switch between Claude and Copilot targets instantly and compare the results.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Token Estimator</h3>
+        <p>Estimates token usage per model and warns you before you hit context limits. Supports Claude Sonnet, GitHub Copilot, Cursor, Ollama, and more.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗃</div>
+        <h3>5 Built-in Templates</h3>
+        <p>Spring Boot + Kotlin, Go + Gin, Python + FastAPI, Vue 3, Android + Kotlin — production-tested rules covering architecture, testing, security, and naming.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💾</div>
+        <h3>Local & Private</h3>
+        <p>Everything runs locally. Your code paths and templates are stored in a local SQLite database. No cloud, no tracking, no account required.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="container">
+    <div style="max-width:640px;">
+      <span class="section-label">How it works</span>
+      <h2 class="section-title">From project path to AI-ready file in 3 steps</h2>
+    </div>
+    <div class="steps" style="max-width:640px; margin-top:3rem;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Point to your project</h3>
+          <p>Enter your project directory path. ContextForge scans for indicator files (<code style="color:#a5b4fc; font-family:'Fira Code',monospace;">go.mod</code>, <code style="color:#a5b4fc; font-family:'Fira Code',monospace;">pom.xml</code>, <code style="color:#a5b4fc; font-family:'Fira Code',monospace;">package.json</code>, …) and detects your tech stack automatically.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Customise your rules</h3>
+          <p>ContextForge loads the best-matching built-in template. Review the rules, toggle any on or off, edit content inline, and add your own custom rules.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Export to your AI tool</h3>
+          <p>Choose Claude or GitHub Copilot as the target. Preview the output, check the token estimate, then export directly into your project directory.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick-start code -->
+    <div style="margin-top:3rem; max-width:680px;">
+      <p class="section-label">Or build from source</p>
+      <div class="code-block">
+        <div><span class="cmt"># Clone & run</span></div>
+        <div><span class="kw">git</span> <span class="cmd">clone</span> <span class="str">https://github.com/wantox86/ContextForge.git</span></div>
+        <div><span class="kw">cd</span> ContextForge</div>
+        <div><span class="kw">make</span> <span class="cmd">dev</span>  <span class="cmt"># hot-reload dev mode</span></div>
+        <div>&nbsp;</div>
+        <div><span class="cmt"># Build for your OS</span></div>
+        <div><span class="kw">make</span> <span class="cmd">mac</span>           <span class="cmt"># macOS arm64</span></div>
+        <div><span class="kw">make</span> <span class="cmd">linux</span>         <span class="cmt"># Linux amd64</span></div>
+        <div><span class="kw">make</span> <span class="cmd">windows-nsis</span>  <span class="cmt"># Windows .exe + installer</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEMPLATES -->
+<section id="templates" style="background:#0d1117; border-top:1px solid #1f2937; border-bottom:1px solid #1f2937;">
+  <div class="container">
+    <div>
+      <span class="section-label">Built-in Templates</span>
+      <h2 class="section-title">Curated rules for popular stacks</h2>
+      <p class="section-sub">Every template covers architecture, coding style, naming, testing, and security — 6 rules each, all editable.</p>
+    </div>
+    <div class="templates-grid">
+      <div class="tpl-card">
+        <h4>🍃 Spring Boot + Kotlin</h4>
+        <div class="tpl-tags">
+          <span class="tpl-tag">kotlin</span>
+          <span class="tpl-tag">spring-boot</span>
+          <span class="tpl-tag">gradle</span>
+        </div>
+      </div>
+      <div class="tpl-card">
+        <h4>🐹 Go + Gin</h4>
+        <div class="tpl-tags">
+          <span class="tpl-tag">golang</span>
+        </div>
+      </div>
+      <div class="tpl-card">
+        <h4>🐍 Python + FastAPI</h4>
+        <div class="tpl-tags">
+          <span class="tpl-tag">python</span>
+          <span class="tpl-tag">fastapi</span>
+        </div>
+      </div>
+      <div class="tpl-card">
+        <h4>💚 Vue 3 + TypeScript</h4>
+        <div class="tpl-tags">
+          <span class="tpl-tag">vue</span>
+          <span class="tpl-tag">nodejs</span>
+        </div>
+      </div>
+      <div class="tpl-card">
+        <h4>🤖 Android + Kotlin</h4>
+        <div class="tpl-tags">
+          <span class="tpl-tag">android</span>
+          <span class="tpl-tag">kotlin</span>
+        </div>
+      </div>
+      <div class="tpl-card" style="border-style:dashed; opacity:.6; display:flex; align-items:center; justify-content:center; color:#6b7280; font-size:.9rem;">
+        ＋ More in v0.2
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOKEN SECTION -->
+<section>
+  <div class="container">
+    <div>
+      <span class="section-label">Token Counter</span>
+      <h2 class="section-title">Never exceed your model's context limit</h2>
+      <p class="section-sub">ContextForge estimates token usage (1 token ≈ 4 chars) and shows a warning before you export.</p>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="token-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Warn at</th>
+            <th>Max context</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>claude-sonnet</td><td>8,000</td><td>200,000</td><td><span class="badge badge-green">✓ Supported</span></td></tr>
+          <tr><td>github-copilot</td><td>6,000</td><td>8,000</td><td><span class="badge badge-green">✓ Supported</span></td></tr>
+          <tr><td>cursor</td><td>6,000</td><td>8,000</td><td><span class="badge badge-green">✓ Supported</span></td></tr>
+          <tr><td>ollama-8k</td><td>6,000</td><td>8,192</td><td><span class="badge badge-green">✓ Supported</span></td></tr>
+          <tr><td>ollama-32k</td><td>24,000</td><td>32,768</td><td><span class="badge badge-green">✓ Supported</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding-top:0;">
+  <div class="container">
+    <div class="cta-banner">
+      <h2>Ready to supercharge your AI assistant?</h2>
+      <p>Download ContextForge for free and start generating context files in minutes.</p>
+      <div class="cta-actions">
+        <a href="download.html" class="btn btn-primary" style="font-size:1rem; padding:.85rem 2rem;">
+          ⬇ Download ContextForge
+        </a>
+        <a href="https://github.com/wantox86/ContextForge" target="_blank" class="btn btn-outline" style="font-size:1rem;">
+          ⭐ Star on GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>
+      <strong>⚡ ContextForge</strong> v0.1.0 &nbsp;·&nbsp;
+      <a href="https://github.com/wantox86/ContextForge">GitHub</a> &nbsp;·&nbsp;
+      <a href="https://github.com/wantox86/ContextForge/blob/master/LICENSE">MIT License</a> &nbsp;·&nbsp;
+      Built with <a href="https://wails.io">Wails</a>, <a href="https://vuejs.org">Vue 3</a> &amp; <a href="https://go.dev">Go</a>
+    </p>
+    <p style="margin-top:.5rem; font-size:.8rem; color:#4b5563;">
+      © 2026 wantox86. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

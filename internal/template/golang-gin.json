@@ -1,0 +1,49 @@
+{
+  "name": "Go + Gin",
+  "description": "Idiomatic Go conventions for Gin-based REST APIs",
+  "stack": ["golang"],
+  "rules": [
+    {
+      "category": "architecture",
+      "title": "Separate handler from business logic",
+      "content": "Gin handlers must only parse input and call service functions. Keep all business logic in service structs under internal/service/.",
+      "priority": 1,
+      "enabled": true
+    },
+    {
+      "category": "coding_style",
+      "title": "Wrap errors with context",
+      "content": "Always use fmt.Errorf(\"package: action: %w\", err) when returning errors. Never discard errors silently.",
+      "priority": 2,
+      "enabled": true
+    },
+    {
+      "category": "coding_style",
+      "title": "Use filepath.Join for paths",
+      "content": "Never concatenate file paths with +. Always use filepath.Join() to ensure cross-platform compatibility.",
+      "priority": 3,
+      "enabled": true
+    },
+    {
+      "category": "testing",
+      "title": "Table-driven tests",
+      "content": "Prefer table-driven tests using []struct{ name, input, expected }. Use t.Run() for subtests. Aim for >80% coverage on internal/ packages.",
+      "priority": 4,
+      "enabled": true
+    },
+    {
+      "category": "naming",
+      "title": "Exported functions need godoc",
+      "content": "Every exported function, type, and constant must have a godoc comment starting with the name of the symbol.",
+      "priority": 5,
+      "enabled": true
+    },
+    {
+      "category": "security",
+      "title": "Validate all external input",
+      "content": "Use binding tags or explicit validation for all request structs. Return 400 with descriptive message for invalid input, never 500.",
+      "priority": 6,
+      "enabled": true
+    }
+  ]
+}

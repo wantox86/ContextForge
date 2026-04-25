@@ -1,0 +1,49 @@
+{
+  "name": "Android + Kotlin",
+  "description": "Modern Android development conventions with Kotlin and Jetpack",
+  "stack": ["android", "kotlin"],
+  "rules": [
+    {
+      "category": "architecture",
+      "title": "Follow MVVM with clean architecture",
+      "content": "Organise code into UI (Fragments/Composables) → ViewModel → Repository → DataSource layers. ViewModels must not hold references to Context or View.",
+      "priority": 1,
+      "enabled": true
+    },
+    {
+      "category": "coding_style",
+      "title": "Use Kotlin coroutines for async",
+      "content": "Use viewModelScope.launch for UI-bound coroutines. Use Dispatchers.IO for I/O operations. Never block the main thread.",
+      "priority": 2,
+      "enabled": true
+    },
+    {
+      "category": "coding_style",
+      "title": "Prefer StateFlow over LiveData",
+      "content": "Use StateFlow<UiState> in ViewModels for observable state. Collect flows in the UI layer using repeatOnLifecycle(Lifecycle.State.STARTED).",
+      "priority": 3,
+      "enabled": true
+    },
+    {
+      "category": "testing",
+      "title": "Test ViewModels with JUnit",
+      "content": "Unit-test ViewModels using JUnit 5 and MockK. Use TestCoroutineDispatcher for coroutine testing. Write instrumented tests for database and UI flows.",
+      "priority": 4,
+      "enabled": true
+    },
+    {
+      "category": "security",
+      "title": "No secrets in source code",
+      "content": "Store API keys in local.properties and inject via BuildConfig. Never commit secrets to version control. Use Android Keystore for sensitive runtime data.",
+      "priority": 5,
+      "enabled": true
+    },
+    {
+      "category": "naming",
+      "title": "Follow Android naming conventions",
+      "content": "Prefix layout files with their type: activity_, fragment_, item_, view_. Suffix ViewModels with ViewModel. Use camelCase for functions and properties.",
+      "priority": 6,
+      "enabled": true
+    }
+  ]
+}

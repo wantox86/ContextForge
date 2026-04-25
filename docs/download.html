@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download — ContextForge</title>
+  <meta name="description" content="Download ContextForge for macOS, Linux, and Windows. Free, open-source desktop app for generating AI coding instructions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    /* ── Page header ── */
+    .page-hero {
+      padding: 4rem 0 3rem;
+      text-align: center;
+      background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(99,102,241,.2) 0%, transparent 70%);
+    }
+    .page-hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: .75rem; }
+    .page-hero p  { color: #9ca3af; font-size: 1.05rem; }
+
+    /* ── OS tabs ── */
+    .os-tabs {
+      display: flex;
+      justify-content: center;
+      gap: .75rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .os-tab {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .6rem 1.4rem;
+      border-radius: .5rem;
+      border: 1.5px solid #374151;
+      background: #1f2937;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: .9rem;
+      font-weight: 500;
+      transition: all .15s;
+    }
+    .os-tab:hover { border-color: #6366f1; color: #fff; }
+    .os-tab.active { border-color: #6366f1; background: #1e1b4b; color: #a5b4fc; }
+    .os-tab .os-icon { font-size: 1.1rem; }
+
+    /* ── Download panel ── */
+    .dl-panel { display: none; }
+    .dl-panel.active { display: block; }
+
+    .dl-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+    .dl-card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: .875rem;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .dl-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dl-card-title { font-weight: 600; font-size: 1rem; }
+    .dl-card-meta  { font-size: .8rem; color: #6b7280; }
+    .dl-card-info  { font-size: .85rem; color: #9ca3af; }
+    .dl-card-info code {
+      background: #111827;
+      padding: .1rem .4rem;
+      border-radius: 3px;
+      font-family: 'Fira Code', monospace;
+      font-size: .82rem;
+      color: #a5b4fc;
+    }
+
+    .btn-download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      padding: .75rem 1.25rem;
+      background: #4f46e5;
+      color: #fff;
+      border-radius: .5rem;
+      font-weight: 600;
+      font-size: .9rem;
+      text-align: center;
+      transition: background .15s, transform .1s;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+    }
+    .btn-download:hover { background: #6366f1; transform: translateY(-1px); }
+    .btn-download.secondary {
+      background: transparent;
+      border: 1.5px solid #374151;
+      color: #9ca3af;
+    }
+    .btn-download.secondary:hover { border-color: #6366f1; color: #fff; }
+
+    /* ── Recommended badge ── */
+    .rec-badge {
+      background: #14532d;
+      color: #86efac;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: .15rem .55rem;
+      border-radius: 4px;
+    }
+
+    /* ── Install steps ── */
+    .install-block {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: .875rem;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .install-block h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .install-steps { counter-reset: step; }
+    .install-step {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: flex-start;
+    }
+    .install-step::before {
+      counter-increment: step;
+      content: counter(step);
+      flex-shrink: 0;
+      width: 1.5rem; height: 1.5rem;
+      background: #312e81;
+      color: #a5b4fc;
+      border-radius: 50%;
+      font-size: .75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: .1rem;
+    }
+    .install-step p { font-size: .9rem; color: #d1d5db; }
+    .install-step code {
+      background: #111827;
+      padding: .15rem .5rem;
+      border-radius: 3px;
+      font-family: 'Fira Code', monospace;
+      font-size: .82rem;
+      color: #a5b4fc;
+    }
+
+    /* ── Prerequisites ── */
+    .prereq-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+    }
+    .prereq-table th {
+      text-align: left;
+      padding: .6rem .875rem;
+      background: #111827;
+      color: #6b7280;
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .prereq-table td {
+      padding: .6rem .875rem;
+      border-bottom: 1px solid #111827;
+    }
+    .prereq-table tr:last-child td { border-bottom: none; }
+    .prereq-table td:first-child { font-weight: 600; }
+    .prereq-table td a { color: #818cf8; }
+    .prereq-table td a:hover { text-decoration: underline; }
+
+    /* ── Source build ── */
+    .source-section {
+      background: #0d1117;
+      border-top: 1px solid #1f2937;
+    }
+    .version-note {
+      background: #1c1917;
+      border: 1px solid #292524;
+      border-radius: .5rem;
+      padding: .75rem 1rem;
+      font-size: .85rem;
+      color: #a8a29e;
+      margin-bottom: 1.5rem;
+    }
+    .version-note strong { color: #fde68a; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container nav-inner">
+    <a class="nav-logo" href="index.html">⚡ ContextForge</a>
+    <ul class="nav-links">
+      <li><a href="index.html#features">Features</a></li>
+      <li><a href="index.html#templates">Templates</a></li>
+      <li><a href="download.html" class="active">Download</a></li>
+      <li>
+        <a href="https://github.com/wantox86/ContextForge" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.341-3.369-1.341-.454-1.154-1.11-1.462-1.11-1.462-.908-.620.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="container">
+    <h1>Download ContextForge</h1>
+    <p>Free, open-source · v0.1.0 · MIT License</p>
+  </div>
+</div>
+
+<!-- MAIN DOWNLOAD -->
+<section>
+  <div class="container">
+
+    <div class="version-note">
+      <strong>⚠ Pre-release:</strong> v0.1.0 builds are generated by CI from the <code style="color:#a5b4fc;font-family:'Fira Code',monospace;">master</code> branch.
+      Once a GitHub Release is published, direct download links will appear here automatically.
+      In the meantime, <a href="https://github.com/wantox86/ContextForge/releases" style="color:#818cf8;">check the Releases page</a> or build from source below.
+    </div>
+
+    <!-- OS tabs -->
+    <div class="os-tabs">
+      <button class="os-tab active" onclick="switchOS('mac', this)">
+        <span class="os-icon">🍎</span> macOS
+      </button>
+      <button class="os-tab" onclick="switchOS('linux', this)">
+        <span class="os-icon">🐧</span> Linux
+      </button>
+      <button class="os-tab" onclick="switchOS('windows', this)">
+        <span class="os-icon">🪟</span> Windows
+      </button>
+    </div>
+
+    <!-- ── macOS ── -->
+    <div class="dl-panel active" id="panel-mac">
+      <div class="dl-cards">
+        <div class="dl-card">
+          <div>
+            <div class="dl-card-head">
+              <span class="dl-card-title">🍎 macOS Apple Silicon</span>
+              <span class="rec-badge">Recommended</span>
+            </div>
+            <p class="dl-card-meta">arm64 · macOS 12+</p>
+          </div>
+          <p class="dl-card-info">For M1, M2, M3, M4 Macs. Native arm64 binary — fastest performance.</p>
+          <a href="https://github.com/wantox86/ContextForge/releases/latest/download/ContextForge-darwin-arm64.zip"
+             class="btn-download">
+            ⬇ Download .zip (arm64)
+          </a>
+        </div>
+        <div class="dl-card">
+          <div>
+            <div class="dl-card-head">
+              <span class="dl-card-title">🍎 macOS Intel</span>
+            </div>
+            <p class="dl-card-meta">amd64 · macOS 11+</p>
+          </div>
+          <p class="dl-card-info">For Intel-based Macs (2019 and earlier). amd64 binary.</p>
+          <a href="https://github.com/wantox86/ContextForge/releases/latest/download/ContextForge-darwin-amd64.zip"
+             class="btn-download secondary">
+            ⬇ Download .zip (amd64)
+          </a>
+        </div>
+      </div>
+
+      <div class="install-block">
+        <h3>📦 Installation</h3>
+        <div class="install-steps">
+          <div class="install-step"><p>Download the <code>.zip</code> for your Mac architecture above.</p></div>
+          <div class="install-step"><p>Open the zip — <code>ContextForge.app</code> will appear. Drag it to your <code>/Applications</code> folder.</p></div>
+          <div class="install-step">
+            <p>
+              On first launch macOS may show <em>"Cannot verify developer"</em> because the app is not notarised.
+              <br/>Right-click <code>ContextForge.app</code> → <strong>Open</strong> → click <strong>Open</strong> in the dialog.
+            </p>
+          </div>
+          <div class="install-step"><p>Or allow it via: <strong>System Settings → Privacy &amp; Security → Open Anyway</strong>.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Linux ── -->
+    <div class="dl-panel" id="panel-linux">
+      <div class="dl-cards">
+        <div class="dl-card">
+          <div>
+            <div class="dl-card-head">
+              <span class="dl-card-title">🐧 Linux x86_64</span>
+              <span class="rec-badge">Recommended</span>
+            </div>
+            <p class="dl-card-meta">amd64 · Ubuntu 20.04+ · Debian 11+</p>
+          </div>
+          <p class="dl-card-info">Native amd64 binary. Requires GTK3 and WebKit2GTK (see prerequisites below).</p>
+          <a href="https://github.com/wantox86/ContextForge/releases/latest/download/ContextForge-linux-amd64.tar.gz"
+             class="btn-download">
+            ⬇ Download .tar.gz
+          </a>
+        </div>
+      </div>
+
+      <div class="install-block">
+        <h3>🔧 Prerequisites</h3>
+        <table class="prereq-table">
+          <thead><tr><th>Package</th><th>Install command</th></tr></thead>
+          <tbody>
+            <tr><td>GTK 3</td><td><code style="font-family:'Fira Code',monospace;font-size:.82rem;color:#a5b4fc;">sudo apt install libgtk-3-0</code></td></tr>
+            <tr><td>WebKit2GTK</td><td><code style="font-family:'Fira Code',monospace;font-size:.82rem;color:#a5b4fc;">sudo apt install libwebkit2gtk-4.0-37</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="install-block">
+        <h3>📦 Installation</h3>
+        <div class="install-steps">
+          <div class="install-step"><p>Install the prerequisites above.</p></div>
+          <div class="install-step">
+            <p>Extract the archive: <code>tar -xzf ContextForge-linux-amd64.tar.gz</code></p>
+          </div>
+          <div class="install-step">
+            <p>Make it executable and move to your PATH:</p>
+          </div>
+        </div>
+        <div class="code-block" style="margin-top:.75rem;">
+          <div><span class="cmd">chmod</span> +x ContextForge</div>
+          <div><span class="cmd">sudo mv</span> ContextForge /usr/local/bin/</div>
+          <div><span class="cmt"># or run directly:</span></div>
+          <div>./ContextForge</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Windows ── -->
+    <div class="dl-panel" id="panel-windows">
+      <div class="dl-cards">
+        <div class="dl-card">
+          <div>
+            <div class="dl-card-head">
+              <span class="dl-card-title">🪟 Windows Installer</span>
+              <span class="rec-badge">Recommended</span>
+            </div>
+            <p class="dl-card-meta">amd64 · Windows 10/11 · NSIS</p>
+          </div>
+          <p class="dl-card-info">Full installer — creates Start Menu entry, desktop shortcut, and Add/Remove Programs entry.</p>
+          <a href="https://github.com/wantox86/ContextForge/releases/latest/download/ContextForge-amd64-installer.exe"
+             class="btn-download">
+            ⬇ Download Installer (.exe)
+          </a>
+        </div>
+        <div class="dl-card">
+          <div>
+            <div class="dl-card-head">
+              <span class="dl-card-title">🪟 Windows Portable</span>
+            </div>
+            <p class="dl-card-meta">amd64 · Windows 10/11 · no install</p>
+          </div>
+          <p class="dl-card-info">Single <code>.exe</code> — no installer needed. Just download and run. Good for USB drives or sandboxed environments.</p>
+          <a href="https://github.com/wantox86/ContextForge/releases/latest/download/ContextForge-windows-amd64.exe"
+             class="btn-download secondary">
+            ⬇ Download Portable (.exe)
+          </a>
+        </div>
+      </div>
+
+      <div class="install-block">
+        <h3>📦 Installation</h3>
+        <div class="install-steps">
+          <div class="install-step"><p>Download the <strong>Installer</strong> version above (recommended).</p></div>
+          <div class="install-step">
+            <p>Windows SmartScreen may show a warning because the app is not code-signed yet. Click <strong>More info → Run anyway</strong>.</p>
+          </div>
+          <div class="install-step"><p>Follow the NSIS installer steps. ContextForge will appear in your Start Menu.</p></div>
+          <div class="install-step"><p>To uninstall: <strong>Settings → Apps → ContextForge → Uninstall</strong>.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BUILD FROM SOURCE -->
+<section class="source-section">
+  <div class="container">
+    <span class="section-label">Build from source</span>
+    <h2 class="section-title">Prefer to build it yourself?</h2>
+    <p class="section-sub" style="margin-bottom:2rem;">Full instructions for all platforms. Requires Go 1.22+, Node.js 18+, and Wails v2.</p>
+
+    <!-- Prerequisites table -->
+    <div class="install-block">
+      <h3>🔧 Prerequisites</h3>
+      <table class="prereq-table">
+        <thead><tr><th>Tool</th><th>Version</th><th>Install</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Go</td><td>1.22+</td>
+            <td><a href="https://go.dev/dl/" target="_blank">go.dev/dl</a></td>
+          </tr>
+          <tr>
+            <td>Node.js</td><td>18+</td>
+            <td><a href="https://nodejs.org" target="_blank">nodejs.org</a></td>
+          </tr>
+          <tr>
+            <td>Wails CLI</td><td>v2</td>
+            <td><code style="font-family:'Fira Code',monospace;font-size:.82rem;color:#a5b4fc;">go install github.com/wailsapp/wails/v2/cmd/wails@latest</code></td>
+          </tr>
+          <tr>
+            <td>gcc (Linux)</td><td>latest</td>
+            <td><code style="font-family:'Fira Code',monospace;font-size:.82rem;color:#a5b4fc;">sudo apt install build-essential</code></td>
+          </tr>
+          <tr>
+            <td>Xcode CLI (macOS)</td><td>latest</td>
+            <td><code style="font-family:'Fira Code',monospace;font-size:.82rem;color:#a5b4fc;">xcode-select --install</code></td>
+          </tr>
+          <tr>
+            <td>TDM-GCC (Windows)</td><td>latest</td>
+            <td><a href="https://jmeubank.github.io/tdm-gcc/" target="_blank">jmeubank.github.io/tdm-gcc</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Build commands -->
+    <div class="install-block">
+      <h3>⚒️ Build commands</h3>
+      <div class="code-block">
+        <div><span class="cmt"># 1. Clone</span></div>
+        <div><span class="kw">git</span> <span class="cmd">clone</span> <span class="str">https://github.com/wantox86/ContextForge.git</span></div>
+        <div><span class="kw">cd</span> ContextForge</div>
+        <div>&nbsp;</div>
+        <div><span class="cmt"># 2. Install dependencies</span></div>
+        <div><span class="kw">go</span> <span class="cmd">mod download</span></div>
+        <div><span class="kw">cd</span> frontend &amp;&amp; <span class="kw">npm</span> <span class="cmd">install</span> &amp;&amp; <span class="kw">cd</span> ..</div>
+        <div>&nbsp;</div>
+        <div><span class="cmt"># 3. Build for your platform</span></div>
+        <div><span class="kw">make</span> <span class="cmd">mac</span>           <span class="cmt"># macOS arm64 → build/bin/ContextForge.app</span></div>
+        <div><span class="kw">make</span> <span class="cmd">mac-amd64</span>     <span class="cmt"># macOS Intel</span></div>
+        <div><span class="kw">make</span> <span class="cmd">linux</span>         <span class="cmt"># Linux amd64 → build/bin/ContextForge</span></div>
+        <div><span class="kw">make</span> <span class="cmd">windows</span>       <span class="cmt"># Windows .exe → build/bin/ContextForge.exe</span></div>
+        <div><span class="kw">make</span> <span class="cmd">windows-nsis</span>  <span class="cmt"># Windows .exe + NSIS installer</span></div>
+        <div>&nbsp;</div>
+        <div><span class="cmt"># Or hot-reload dev mode</span></div>
+        <div><span class="kw">make</span> <span class="cmd">dev</span></div>
+      </div>
+    </div>
+
+    <!-- Run tests -->
+    <div class="install-block">
+      <h3>🧪 Run tests</h3>
+      <div class="code-block">
+        <div><span class="kw">make</span> <span class="cmd">test</span>       <span class="cmt"># all Go tests</span></div>
+        <div><span class="kw">make</span> <span class="cmd">test-race</span>  <span class="cmt"># with race detector</span></div>
+        <div><span class="kw">make</span> <span class="cmd">vet</span>        <span class="cmt"># go vet</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>
+      <strong>⚡ ContextForge</strong> v0.1.0 &nbsp;·&nbsp;
+      <a href="https://github.com/wantox86/ContextForge">GitHub</a> &nbsp;·&nbsp;
+      <a href="https://github.com/wantox86/ContextForge/blob/master/LICENSE">MIT License</a> &nbsp;·&nbsp;
+      <a href="https://github.com/wantox86/ContextForge/releases">All Releases</a>
+    </p>
+    <p style="margin-top:.5rem; font-size:.8rem; color:#4b5563;">
+      © 2026 wantox86. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+<script>
+  function switchOS(os, btn) {
+    // Deactivate all tabs and panels
+    document.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'))
+    document.querySelectorAll('.dl-panel').forEach(p => p.classList.remove('active'))
+    // Activate selected
+    btn.classList.add('active')
+    document.getElementById('panel-' + os).classList.add('active')
+  }
+
+  // Auto-detect OS on load
+  (function detectOS() {
+    const ua = navigator.userAgent
+    let os = 'mac'
+    if (/Windows/i.test(ua)) os = 'windows'
+    else if (/Linux/i.test(ua)) os = 'linux'
+    if (os !== 'mac') {
+      const tab = document.querySelector(`.os-tab[onclick*="'${os}'"]`)
+      if (tab) switchOS(os, tab)
+    }
+  })()
+</script>
+
+</body>
+</html>
