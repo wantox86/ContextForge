@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  # ── Go tests & vet ──────────────────────────────────────────────────────────
+  go-test:
+    name: Go Tests & Vet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y gcc pkg-config libgtk-3-dev libwebkit2gtk-4.0-dev
+
+      - name: Run tests with race detector
+        run: go test -race -v ./...
+
+      - name: Run go vet
+        run: go vet ./...
+
+  # ── Frontend build & typecheck ─────────────────────────────────────────────
+  frontend:
+    name: Frontend Build & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Type check + build
+        working-directory: frontend
+        run: npm run build

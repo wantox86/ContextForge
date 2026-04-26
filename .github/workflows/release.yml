@@ -1,0 +1,232 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag (e.g. v0.1.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  # ── Go tests (gate before building) ───────────────────────────────────────
+  test:
+    name: Go Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y gcc pkg-config
+
+      - name: Run tests
+        run: go test -race ./...
+
+      - name: Run vet
+        run: go vet ./...
+
+  # ── macOS arm64 (Apple Silicon) ────────────────────────────────────────────
+  build-mac-arm64:
+    name: Build · macOS arm64
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build
+        run: wails build -platform darwin/arm64 -o ContextForge
+
+      - name: Compress
+        run: cd build/bin && zip -r ContextForge-darwin-arm64.zip ContextForge.app
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: darwin-arm64
+          path: build/bin/ContextForge-darwin-arm64.zip
+          retention-days: 7
+
+  # ── macOS amd64 (Intel) ────────────────────────────────────────────────────
+  build-mac-amd64:
+    name: Build · macOS amd64
+    needs: test
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build
+        run: wails build -platform darwin/amd64 -o ContextForge
+
+      - name: Compress
+        run: cd build/bin && zip -r ContextForge-darwin-amd64.zip ContextForge.app
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: darwin-amd64
+          path: build/bin/ContextForge-darwin-amd64.zip
+          retention-days: 7
+
+  # ── Linux amd64 ────────────────────────────────────────────────────────────
+  build-linux:
+    name: Build · Linux amd64
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            gcc pkg-config \
+            libgtk-3-dev \
+            libwebkit2gtk-4.0-dev
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build
+        run: wails build -platform linux/amd64 -o ContextForge
+
+      - name: Compress
+        run: cd build/bin && tar -czf ContextForge-linux-amd64.tar.gz ContextForge
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-amd64
+          path: build/bin/ContextForge-linux-amd64.tar.gz
+          retention-days: 7
+
+  # ── Windows amd64 ──────────────────────────────────────────────────────────
+  build-windows:
+    name: Build · Windows amd64
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install NSIS
+        run: choco install nsis --yes
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build (exe + NSIS installer)
+        run: wails build -platform windows/amd64 -nsis -o ContextForge
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe
+          path: build/bin/ContextForge.exe
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: build/bin/ContextForge-amd64-installer.exe
+          retention-days: 7
+
+  # ── GitHub Release ─────────────────────────────────────────────────────────
+  release:
+    name: Create GitHub Release
+    needs: [build-mac-arm64, build-mac-amd64, build-linux, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/
+
+      - name: Display artifacts
+        run: find dist/ -type f | sort
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ContextForge ${{ github.ref_name }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') || contains(github.ref_name, '-rc') }}
+          generate_release_notes: true
+          files: |
+            dist/darwin-arm64/ContextForge-darwin-arm64.zip
+            dist/darwin-amd64/ContextForge-darwin-amd64.zip
+            dist/linux-amd64/ContextForge-linux-amd64.tar.gz
+            dist/windows-exe/ContextForge.exe
+            dist/windows-installer/ContextForge-amd64-installer.exe
