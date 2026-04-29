@@ -43,10 +43,12 @@ const tabs: { id: Tab; label: string }[] = [
 
     <!-- Main content -->
     <main class="flex-1 overflow-hidden">
-      <ProjectAnalyzer v-if="activeTab === 'analyze'" @analyzed="activeTab = 'rules'" />
-      <RuleBuilder     v-else-if="activeTab === 'rules'" />
-      <PreviewPanel    v-else-if="activeTab === 'preview'" />
-      <ExportPanel     v-else-if="activeTab === 'export'" />
+      <KeepAlive>
+        <ProjectAnalyzer v-if="activeTab === 'analyze'" @analyzed="activeTab = 'rules'" />
+        <RuleBuilder     v-else-if="activeTab === 'rules'" />
+        <PreviewPanel    v-else-if="activeTab === 'preview'" />
+        <ExportPanel     v-else-if="activeTab === 'export'" />
+      </KeepAlive>
     </main>
   </div>
 </template>

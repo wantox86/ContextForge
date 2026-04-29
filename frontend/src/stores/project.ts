@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Project, DetectionResult } from '../types'
-import { AnalyzeProject, ExportToFile, PreviewExport } from '../../wailsjs/go/main/App'
+import type { DetectionResult } from '../types'
+import { storage } from '../../wailsjs/go/models'
+import { AnalyzeProject, ExportToFile, GetProjectByPath, PreviewExport } from '../../wailsjs/go/main/App'
 
 export const useProjectStore = defineStore('project', () => {
-  const currentProject = ref<Project | null>(null)
+  const currentProject = ref<storage.Project | null>(null)
   const detectionResult = ref<DetectionResult | null>(null)
   const isAnalyzing = ref(false)
   const error = ref<string | null>(null)
@@ -15,6 +16,9 @@ export const useProjectStore = defineStore('project', () => {
     try {
       const result = await AnalyzeProject(path)
       detectionResult.value = result
+      // Fetch the persisted project so we have its DB ID for preview/export
+      const project = await GetProjectByPath(path)
+      currentProject.value = project
       return result
     } catch (e) {
       error.value = `Failed to analyze project. Please check the path and try again.`
@@ -42,7 +46,7 @@ export const useProjectStore = defineStore('project', () => {
     }
   }
 
-  function setCurrentProject(project: Project) {
+  function setCurrentProject(project: storage.Project) {
     currentProject.value = project
   }
 

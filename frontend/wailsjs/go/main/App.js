@@ -18,6 +18,10 @@ export function ExportToFile(arg1, arg2, arg3) {
   return window['go']['main']['App']['ExportToFile'](arg1, arg2, arg3);
 }
 
+export function GetProjectByPath(arg1) {
+  return window['go']['main']['App']['GetProjectByPath'](arg1);
+}
+
 export function GetTemplates() {
   return window['go']['main']['App']['GetTemplates']();
 }

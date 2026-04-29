@@ -12,6 +12,8 @@ export function CountTokens(arg1:string):Promise<number>;
 
 export function ExportToFile(arg1:number,arg2:string,arg3:string):Promise<void>;
 
+export function GetProjectByPath(arg1:string):Promise<storage.Project>;
+
 export function GetTemplates():Promise<Array<storage.Template>>;
 
 export function GetTemplatesByStack(arg1:Array<string>):Promise<Array<storage.Template>>;

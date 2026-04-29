@@ -45,6 +45,29 @@ export namespace storage {
 	        this.Enabled = source["Enabled"];
 	    }
 	}
+	export class Project {
+	    ID: number;
+	    Name: string;
+	    Path: string;
+	    DetectedStack: string[];
+	    AppliedTemplates: number[];
+	    // Go type: time
+	    CreatedAt: any;
+
+	    static createFrom(source: any = {}) {
+	        return new Project(source);
+	    }
+
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.Name = source["Name"];
+	        this.Path = source["Path"];
+	        this.DetectedStack = source["DetectedStack"];
+	        this.AppliedTemplates = source["AppliedTemplates"];
+	        this.CreatedAt = source["CreatedAt"];
+	    }
+	}
 	export class Template {
 	    ID: number;
 	    Name: string;

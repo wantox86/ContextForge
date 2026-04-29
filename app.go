@@ -122,6 +122,18 @@ func (a *App) GetTemplatesByStack(stack []string) ([]storage.Template, error) {
 	return matched, nil
 }
 
+// GetProjectByPath returns the persisted project record for the given path.
+func (a *App) GetProjectByPath(path string) (storage.Project, error) {
+	if a.db == nil {
+		return storage.Project{}, fmt.Errorf("app: database not initialised")
+	}
+	p, err := a.db.GetProjectByPath(path)
+	if err != nil {
+		return storage.Project{}, fmt.Errorf("app: get project by path: %w", err)
+	}
+	return *p, nil
+}
+
 // SaveTemplate creates or updates a template (upsert by ID).
 func (a *App) SaveTemplate(template storage.Template) error {
 	if a.db == nil {

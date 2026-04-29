@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onActivated } from 'vue'
 import { useProjectStore } from '../stores/project'
 import { useExportStore } from '../stores/export'
 
@@ -21,7 +21,11 @@ async function refresh() {
 }
 
 onMounted(refresh)
+// Re-run when tab becomes active again (KeepAlive)
+onActivated(refresh)
+// Re-run when target changes or when a project is first analyzed
 watch(() => exportStore.selectedTarget, refresh)
+watch(() => projectStore.currentProject, (proj) => { if (proj) refresh() })
 </script>
 
 <template>
